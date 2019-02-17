@@ -3,41 +3,48 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Utility;
 
 namespace Receiver
 {
 	class Program
 	{
-		public const string AppSettingsFile = "appsettings.json";
-		public const string HostNameKey = "HostName";
-		public const string MainQueueNameKey = "MainQueueName";
+		const string AppSettingsFile = "appsettings.json";
+		const string HostNameKey = "HostName";
+		const string MainQueueNameKey = "MainQueueName";
+		static string HostName { get;set; }
+		static string MainQueueName { get;set; }
 
-		static void Main(string[] args)
+		static void Setup()
 		{
-			Console.WriteLine($"Starting {nameof(Receiver)} Console App");
-
 			var config = new ConfigurationBuilder()
 				.AddJsonFile(AppSettingsFile, true, true)
 				.Build();
-			var hostName = config[HostNameKey];
-			var mainQueueName = config[MainQueueNameKey];
+			HostName = config[HostNameKey];
+			MainQueueName = config[MainQueueNameKey];
+		}
 
-			var queueFactory = new ConnectionFactory { HostName = hostName };
+		static void Main(string[] args)
+		{
+			Setup();
+			Console.WriteLine($"Starting {nameof(Receiver)} Console App");
+			var queueFactory = new ConnectionFactory { HostName = HostName };
 
 			using (var queueConnection = queueFactory.CreateConnection())
 			using (var queueChannel = queueConnection.CreateModel())
 			{
-				queueChannel.QueueDeclare(mainQueueName, false, false, false, arguments: null);
+				queueChannel.QueueDeclare(MainQueueName, false, false, false, arguments: null);
 
 				var consumer = new EventingBasicConsumer(queueChannel);
 				consumer.Received += (model, ea) =>
 				{
 					var messageBody = ea.Body;
 					var messageDecoded = Encoding.UTF8.GetString(messageBody);
-					Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded}, I am your father!");
+					if (messageDecoded.ValidForStarWarsReturnMessage())
+						Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded}, I am your father!");
 				};
 
-				queueChannel.BasicConsume(mainQueueName, true, consumer);
+				queueChannel.BasicConsume(MainQueueName, true, consumer);
 				Console.ReadLine();
 			}
 		}

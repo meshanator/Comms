@@ -1,30 +1,38 @@
 ﻿using System;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 
 namespace Sender
 {
 	class Program
 	{
-		public const string HostName = "localhost";
-		public const string MainQueueName = "main";
+		public const string AppSettingsFile = "appsettings.json";
+		public const string HostNameKey = "HostName";
+		public const string MainQueueNameKey = "MainQueueName";
 
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Starting Sender Console App");
+			Console.WriteLine($"Starting {nameof(Sender)} Console App");
 
-			var queueFactory = new ConnectionFactory { HostName = HostName };
+			var config = new ConfigurationBuilder()
+				.AddJsonFile(AppSettingsFile, true, true)
+				.Build();
+			var hostName = config[HostNameKey];
+			var mainQueueName = config[MainQueueNameKey];
+
+			var queueFactory = new ConnectionFactory { HostName = hostName };
 			while (true)
 			{
 				using (var queueConnection = queueFactory.CreateConnection())
 				using (var queueChannel = queueConnection.CreateModel())
 				{
-					queueChannel.QueueDeclare(MainQueueName, false, false, false, null);
+					queueChannel.QueueDeclare(mainQueueName, false, false, false, null);
 
 					var messageToSend = Console.ReadLine();
 					var encodedMessage = Encoding.UTF8.GetBytes(messageToSend);
 
-					queueChannel.BasicPublish(string.Empty, MainQueueName, null, body: encodedMessage);
+					queueChannel.BasicPublish(string.Empty, mainQueueName, null, body: encodedMessage);
 					Console.WriteLine("message sent");
 				}
 			}

@@ -23,24 +23,22 @@ namespace Receiver
 			var mainQueueName = config[MainQueueNameKey];
 
 			var queueFactory = new ConnectionFactory { HostName = hostName };
-			while (true)
+
+			using (var queueConnection = queueFactory.CreateConnection())
+			using (var queueChannel = queueConnection.CreateModel())
 			{
-				using (var queueConnection = queueFactory.CreateConnection())
-				using (var queueChannel = queueConnection.CreateModel())
+				queueChannel.QueueDeclare(mainQueueName, false, false, false, arguments: null);
+
+				var consumer = new EventingBasicConsumer(queueChannel);
+				consumer.Received += (model, ea) =>
 				{
-					queueChannel.QueueDeclare(mainQueueName, false, false, false, arguments: null);
+					var messageBody = ea.Body;
+					var messageDecoded = Encoding.UTF8.GetString(messageBody);
+					Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded}, I am your father!");
+				};
 
-					var consumer = new EventingBasicConsumer(queueChannel);
-					consumer.Received += (model, ea) =>
-					{
-						var messageBody = ea.Body;
-						var messageDecoded = Encoding.UTF8.GetString(messageBody);
-						Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded}, I am your father!");
-					};
-
-					queueChannel.BasicConsume(mainQueueName, true, consumer);
-					Console.ReadLine();
-				}
+				queueChannel.BasicConsume(mainQueueName, true, consumer);
+				Console.ReadLine();
 			}
 		}
 	}

@@ -29,6 +29,7 @@ namespace Sender
 				{
 					queueChannel.QueueDeclare(mainQueueName, false, false, false, null);
 
+					Console.Write("Enter a name: ");
 					var messageToSend = Console.ReadLine();
 					var encodedMessage = Encoding.UTF8.GetBytes(messageToSend);
 

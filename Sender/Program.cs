@@ -25,7 +25,11 @@ namespace Sender
 		static void Main(string[] args)
 		{
 			Setup();
+
 			Console.WriteLine($"Starting {nameof(Sender)} Console App");
+			Console.WriteLine("Enter your greeting text, followed by your name.");
+			Console.WriteLine("Eg. Hello my name is, Mark");
+
 			var queueFactory = new ConnectionFactory { HostName = HostName };
 
 			while (true)
@@ -34,8 +38,8 @@ namespace Sender
 				using (var queueChannel = queueConnection.CreateModel())
 				{
 					queueChannel.QueueDeclare(MainQueueName, false, false, false, null);
-
-					Console.Write("Enter a name: ");
+					
+					Console.Write("Type: ");
 					var messageToSend = Console.ReadLine();
 					var encodedMessage = Encoding.UTF8.GetBytes(messageToSend);
 

@@ -35,36 +35,5 @@ namespace Tests
 			//assert
 			Assert.IsFalse(valid);
 		}
-
-		/*		[TestMethod]
-				public void SW_Validation_Valid_Message()
-				{
-					//Arrange
-					var prefix = "Hello my name is, ";
-					var pattern = $"(?<={prefix}).*$";
-					var name = "Hello my name is, Leia";
-
-					//act
-					var reg = Regex.Match(name, pattern);
-
-					//assert
-					Assert.IsTrue(reg.Success);
-					Trace.WriteLine(reg.Value);
-				}
-
-				[TestMethod]
-				public void SW_Validation_Invalid_Message()
-				{
-					//Arrange
-					var prefix = "Hello my name is, ";
-					var pattern = $"(?<={prefix}).*$";
-					var name = "Howdy my name is, Leia";
-
-					//act
-					var reg = Regex.Match(name, pattern);
-
-					//assert
-					Assert.IsFalse(reg.Success);
-				}*/
 	}
 }

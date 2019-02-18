@@ -40,8 +40,8 @@ namespace Receiver
 				{
 					var messageBody = ea.Body;
 					var messageDecoded = Encoding.UTF8.GetString(messageBody);
-					if (messageDecoded.ValidForStarWarsReturnMessage())
-						Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded}, I am your father!");
+					if (messageDecoded.ValidForStarWarsName())
+						Console.WriteLine($"{DateTime.Now:MM/dd/yyyy hh:mm tt}: Hello {messageDecoded.StarWarsName()}, I am your father!");
 				};
 
 				queueChannel.BasicConsume(MainQueueName, true, consumer);

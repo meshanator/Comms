@@ -40,7 +40,7 @@ namespace Sender
 					var encodedMessage = Encoding.UTF8.GetBytes(messageToSend);
 
 					queueChannel.BasicPublish(string.Empty, MainQueueName, null, body: encodedMessage);
-					Console.WriteLine("message sent");
+					Console.WriteLine("Message sent");
 				}
 			}
 		}
